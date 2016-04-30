@@ -4,17 +4,84 @@
 
 	{% load staticfiles %}
 	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/offcanvas.css' %}" />
 </head>
 <body>
-	<a href="{% url 'index' %}">
-		<h1>Walker</h1>
-	</a>
-	<a href="{% url 'cart' %}">Cart</a>
-	<a href="{% url 'order_status_form' %}">Order Status</a>
-	<br>
-	{% for category in categories %}
-		<a href="{% url 'product_list' category.0 %}">{{ category.1 }}</a>
-	{% endfor %}
-	{% block content %}{% endblock %}
+
+
+<nav class="navbar navbar-fixed-top navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{% url 'index' %}">Crimea sneakers</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="{% url 'cart' %}">Корзина</a></li>
+            <li><a href="{% url 'order_status_form' %}">Статус заказа</a></li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+    <div class="container">
+
+      <div class="row row-offcanvas row-offcanvas-right">
+
+        <div class="col-xs-12 col-sm-9">
+          <p class="pull-right visible-xs">
+            <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+          </p>
+          
+
+
+
+					{% block content %}{% endblock %}
+
+
+
+
+        </div><!--/.col-xs-12.col-sm-9-->
+
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+          <div class="list-group">
+						{% for category in categories %}
+							<a href="{% url 'product_list' category.0 %}" class="list-group-item {% if forloop.first %} active {% endif %}">{{ category.1 }}</a>
+						{% endfor %}
+          </div>
+        </div><!--/.sidebar-offcanvas-->
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>&copy; 2015 Company, Inc.</p>
+      </footer>
+
+    </div><!--/.container-->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/offcanvas.js' %}"></script>
+
+
+
+
+
+
+
+
+
 </body>
 </html>	

@@ -2,19 +2,26 @@
 
 {% block content %}
 	{% load staticfiles %}
+
+  <div class="jumbotron">
+    <h1>Продажа обуви в Крыму</h1>
+    <p>Работаем без предоплат</p>
+    <p>Доставка от 1 часа до 2 дней</p>
+    <p>Оплата заказа только после личной проверки товара</p>
+  </div>
 	{% for product in product_list %}
 		{% if product.available == True %}
-	    <div class="product">
-	        {% load staticfiles %}
-	        {% with product.photo_set.all|first as image %}
-					  <img class="img-circle" src="{% static image.img %}" width="100px"/>
-					{% endwith %} 
-	        <!-- <img  class="img-circle" src="{{ p.product_image.url }}" width="100"> -->
-	        <a href="{% url 'product' product.slug %}">{{ product.name }}</a>
-	        <div class="price">{{ product.price }}</div>
-	        <a href="{% url 'product' product.slug %}">Подробнее</a>
-	        <!-- <a href="{% url 'add_product_to_cart' product.id %}">Подробнее</a> -->
-	    </div>  
+
+	    	<div class="row">
+          <div class="col-xs-6 col-lg-4">
+            <h2>{{ product.name }}</h2>
+            {% with product.photo_set.all|first as image %}
+						  <img class="img-circle" src="{% static image.img %}" width="100px"/>
+						{% endwith %} 
+            <p>Тестовое место для текста</p>
+            <p><a class="btn btn-default" href="{% url 'product' product.slug %}" role="button">Подробнее &raquo;</a></p>
+          </div><!--/.col-xs-6.col-lg-4-->
+        </div><!--/row-->
 	  {% endif %}
 	{% endfor %} 
 {% endblock %}

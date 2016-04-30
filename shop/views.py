@@ -13,13 +13,18 @@ COOKIES_ID ='walker_test3'
 shop_name = u'Бродяга'
 
 
+def _categories():
+
+    return [brand for brand in Product.BRANDS]
+
+
 def index(request):
     context = {
         'product_list': Product.objects.all(),
-
-        'categories': [brand for brand in Product.BRANDS],
         'cookies_id': COOKIES_ID,
     }
+
+    context['categories'] = _categories()
 
     response = render(request, 'index.html', context)
     return response
@@ -115,6 +120,7 @@ def product(request, slug):
         'sizes': Size.objects.filter(product=target_product),
         'photos': Photo.objects.filter(product=target_product)
     }
+    context['categories'] = _categories()
     return render(request, 'product.html', context)
 
 
