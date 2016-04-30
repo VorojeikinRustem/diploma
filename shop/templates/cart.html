@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% load staticfiles %}
+	{% for cart_element in cart_elements %}
+	    <div class="product">
+	        <span>{{ cart_element.product.name }}</span>
+	        <span>{{ cart_element.product.price }}</span>
+	        <span>{{ cart_element.product.brand }}</span>
+	        {% with cart_element.product.photo_set.all|first as image %}
+					  <img class="img-circle" src="{% static image.img %}" width="100px"/>
+					{% endwith %} 
+	        <span>Size: {{ cart_element.size }}</span>
+	    </div>
+	{% endfor %}
+ 
+	<a href="{% url 'checkout' %}">Оформить заказ</a>
+{% endblock %}

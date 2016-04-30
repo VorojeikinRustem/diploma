@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% load staticfiles %}
+
+	<form action="/order_status/" method="post">
+		{% csrf_token %}
+		<fieldset>
+			<legend>Проверить статус заказа</legend>
+			<label for="order_id">Номер заказа: </label>
+			<input type="text" name="order_id"><br>
+			<label for="phone">Номер телефона: </label>
+			<input type="tel" name="phone" pattern="[0-9]{11}"><br>
+			
+			<input type="submit" value="Готово">
+			
+		</fieldset>
+	</form>
+
+{% endblock %}

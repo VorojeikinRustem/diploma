@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% load staticfiles %}
+
+	<form action="/create_order/" method="post">
+		{% csrf_token %}
+		<fieldset>
+		<legend>Оформление заказа</legend>
+		<label for="username">Имя: </label>
+		<input type="text" name="username"><br>
+		<label for="phone">Телефон: </label>
+		<input type="tel" name="phone" pattern="[0-9]{11}"><br>
+		<label for="address">Адрес: </label>
+		<input type="text" name="address"><br>
+		<label for="email">Email: </label>
+		<input type="email" name="email"><br>
+		<label for="express_delivery">Срочная доставка: </label>
+		<input type="checkbox" name="express_delivery"><br>
+		
+		<input type="submit" value="Оформить заказ">
+		
+	</fieldset>
+	</form>
+
+{% endblock %}
