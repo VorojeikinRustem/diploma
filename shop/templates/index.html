@@ -14,12 +14,21 @@
 
 	    	<div class="row">
           <div class="col-xs-6 col-lg-4">
-            <h2>{{ product.name }}</h2>
-            {% with product.photo_set.all|first as image %}
-						  <img class="img-circle" src="{% static image.img %}" width="100px"/>
-						{% endwith %} 
-            <p>Тестовое место для текста</p>
-            <p><a class="btn btn-default" href="{% url 'product' product.slug %}" role="button">Подробнее &raquo;</a></p>
+            <div class="thumbnail">
+              {% with product.photo_set.all|first as image %}
+  						  <img class="img-rounded" src="{% static image.img %}">
+  						{% endwith %} 
+              <div class="caption">
+                <h2>{{ product.name }}</h2>
+                <p>Тестовое место для текста</p>
+                <a class="btn btn-primary" href="{% url 'product' product.slug %}">
+                    <span class="badge">
+                      {{ product.price }}
+                      <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </span> Подробнее &raquo;
+                </a>
+              </div>
+            </div>  
           </div><!--/.col-xs-6.col-lg-4-->
         </div><!--/row-->
 	  {% endif %}

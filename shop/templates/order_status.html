@@ -3,7 +3,7 @@
 {% block content %}
 	{% load staticfiles %}
 	<p>Приветствуем, {{ order.username }}</p>
-	<p>Статус вашего заказа: <b>{{ order.get_status_display }}</b></p> <!-- УБРАТЬ ПОЗЖЕ -->
+	<p>Статус вашего заказа: <span class="label label-primary">{{ order.get_status_display }}</span></p> <!-- УБРАТЬ ПОЗЖЕ -->
 	<p>Дата заказа: {{ order.checkout_datetime|date:"d.m.Y G:i" }}
 
 

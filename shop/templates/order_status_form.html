@@ -9,8 +9,12 @@
 			<legend>Проверить статус заказа</legend>
 			<label for="order_id">Номер заказа: </label>
 			<input type="text" name="order_id"><br>
-			<label for="phone">Номер телефона: </label>
-			<input type="tel" name="phone" pattern="[0-9]{11}"><br>
+			
+			<div class="input-group">
+				<label for="phone">Номер телефона: </label>
+				<span class="input-group-addon">+</span>
+				<input type="tel" class="form-control" name="phone" pattern="[0-9]{11}"><br>
+			</div>
 			
 			<input type="submit" value="Готово">
 			
