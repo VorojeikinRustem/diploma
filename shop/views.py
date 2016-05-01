@@ -14,9 +14,14 @@ shop_name = u'Бродяга'
 
 
 def _categories():
-
     return [brand for brand in Product.BRANDS]
 
+def _products_in_cart(request):
+    products_in_cart = len(CartElement.objects.filter(cart=Cart.objects.get(id=request.COOKIES.get(COOKIES_ID))))
+    if products_in_cart > 0:
+        return products_in_cart
+    else: 
+        return 0
 
 def index(request):
     context = {
@@ -25,15 +30,26 @@ def index(request):
     }
 
     context['categories'] = _categories()
-
+    context['products_in_cart'] = _products_in_cart(request)
     response = render(request, 'index.html', context)
+
     return response
  
 
+def search(request):
+    context = {
+        'product_list': Product.objects.filter(name__contains=request.POST['search']),
+        'categories': [brand for brand in Product.BRANDS]
+    }
+    context['products_in_cart'] = _products_in_cart(request)
+    return render(request, 'index.html', context)
+
+
 def product_list(request, brand):
     context = {
+        'cat': str(brand),
         'product_list': Product.objects.filter(brand=brand),
-        'categories': [brand for brand in Product.BRANDS],
+        'categories': [brand for brand in Product.BRANDS]
     }
     return render(request, 'index.html', context)
 
@@ -42,20 +58,14 @@ def add_product_to_cart(request):
     context={}
     response = HttpResponseRedirect('/cart/')
     product_id = request.POST['product_id']
-    print('START')
     if (request.COOKIES.get(COOKIES_ID)):
-        print('GET_START')
         cart = Cart.objects.get(
             id=request.COOKIES.get(COOKIES_ID)
         )
-        print('GET_FINIS')
     else:
-        print('CREATE_START')
         cart = Cart.objects.create(
             total_amount=0
         )
-        print('CREATE_FINISH')
-    print('FINISH')
 
     cart_id = cart.id
     cart_element = CartElement.objects.create(
@@ -108,6 +118,7 @@ def cart(request):
         cart=cart_id
     )
     context['cart_elements'] = cart_elements
+    context['products_in_cart'] = _products_in_cart(request)
     context['categories'] = [brand for brand in Product.BRANDS]
     
     return render(request, 'cart.html', context)    
@@ -120,12 +131,14 @@ def product(request, slug):
         'sizes': Size.objects.filter(product=target_product),
         'photos': Photo.objects.filter(product=target_product)
     }
+    context['products_in_cart'] = _products_in_cart(request)
     context['categories'] = _categories()
     return render(request, 'product.html', context)
 
 
 def checkout(request):
     context = {}
+    context['products_in_cart'] = _products_in_cart(request)
     return render(request, 'checkout.html', context)
 
 
@@ -175,6 +188,7 @@ def order_status(request):
             phone=request.POST['phone']
         )
     }
+    context['products_in_cart'] = _products_in_cart(request)
 
     return render(request, 'order_status.html', context)
 
@@ -182,5 +196,6 @@ def order_status(request):
 def order_status_form(request):
     context = {
     }
+    context['products_in_cart'] = _products_in_cart(request)
 
     return render(request, 'order_status_form.html', context)

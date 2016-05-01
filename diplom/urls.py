@@ -23,6 +23,7 @@ from shop import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^cart/', views.cart, name='cart'),
+    url(r'^search/', views.search, name='search'),
     url(r'^checkout/', views.checkout, name='checkout'),
     url(r'^create_order/', views.create_order, name='create_order'),
     url(r'^order_status/', views.order_status, name='order_status'),
