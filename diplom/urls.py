@@ -28,10 +28,10 @@ urlpatterns = [
     url(r'^create_order/', views.create_order, name='create_order'),
     url(r'^order_status/', views.order_status, name='order_status'),
     url(r'^order_status_form/', views.order_status_form, name='order_status_form'),
-    url(r'^product_list/(?P<brand>\w{0,15})/', views.product_list, name='product_list'),
     url(r'^add/', views.add_product_to_cart, name='add_product_to_cart'),
     url(r'^add/(?P<product_id>\d+)/', views.add_product_to_cart, name='add_product_to_cart'),
-    url(r'^product/(?P<slug>[-\w]+)/', views.product, name='product'),
+    url(r'^(?P<brand>\w{0,15})/(?P<slug>[-\w]+)/', views.product, name='product'),
+    url(r'^(?P<brand>\w{0,15})/', views.product_list, name='product_list'),
     url(r'^$', views.index, name='index'),
 ]
 

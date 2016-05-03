@@ -2,23 +2,49 @@
 
 {% block content %}
 	{% load staticfiles %}
-  {% for photo in photos %}
-    <img class="img-circle" src='{% static photo.img.url %}' width="100">
-  {% endfor %}
+
+  <ol class="breadcrumb">
+    <li><a href="{% url 'index' %}">Главная</a></li>
+    <li><a href="{% url 'product_list' breadcrumb_brand %}">{{ breadcrumb_brand|title }}</a></li>
+    <li class="active">{{ breadcrumb_slug }}</li>
+  </ol>
+
+  <div>
+    <h1>{{ product.name }}</h1>
+    <h3>
+      Цена: 
+      <span class="label label-success">
+        {{ product.price }}
+        <span class="glyphicon glyphicon-rub" aria-hidden="true"></span>
+      </span>
+    </h3>
+  </div>  
+  <div class="row">
+    {% for photo in photos %}
+      <div class="col-xs-6 col-md-3" data-slider="img">
+        <div class="thumbnail">
+            <img src='{% static photo.img.url %}' height="140">
+        </div>
+      </div>
+    {% endfor %}
+  </div>
   <!-- <img  class="img-circle" src="{{ p.product_image.url }}" width="100"> -->
-  <div>{{ product.name }}</div>
-  <div class="price">{{ product.price }}</div>
   <!-- <a href="{% url 'add_product_to_cart' product.id %}">Купить</a> -->
-  Имеющиеся размеры: 
   <form action="/add/" method="post">
-    {% csrf_token %}
-    <input type="hidden" name="product_id" value="{{ product.id }}">
+    Имеющиеся размеры: 
   	{% for size in sizes %}
   		{% if size.available == True %}
-  			<input type="radio" name="size" value="{{ size }}"> {{ size }}
+        <label data-shop="size" class="radio-inline">
+          <input type="radio" name="size" id="soze" value="{{ size }}"> {{ size }}
+        </label>
   		{% endif %}
   	{% endfor %}
-  	<input type="submit" value="Купить">
+
+    {% csrf_token %}
+    <input type="hidden" name="product_id" value="{{ product.id }}">
+    <h6>
+      <button type="submit" class="btn btn-primary">Купить</button>
+    </h6>
 	</form>
 
 {% endblock %}

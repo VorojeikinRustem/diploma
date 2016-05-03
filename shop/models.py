@@ -8,21 +8,15 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class Product(models.Model):
-    UNDEFINED = 'undefined'
-    ADIDAS = 'adidas'
+    ASICS = 'asics'
+    JORDAN = 'jordan'
     NIKE = 'nike'
-    REEBOK = 'reebok'
-    PUMA = 'puma'
     NEW_BALANCE = 'new_balance'
-    COLUMBIA = 'columbia'
     BRANDS = (
-        (UNDEFINED, 'Undefined'),
-        (ADIDAS, 'Adidas'),
+        (ASICS, 'Asics'),
+        (JORDAN, 'Jordan'),
         (NIKE, 'Nike'),
-        (REEBOK, 'Reebok'),
-        (PUMA, 'Puma'),
         (NEW_BALANCE, 'New Balance'),
-        (COLUMBIA, 'Columbia'),
     )
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50)
@@ -31,7 +25,7 @@ class Product(models.Model):
     brand = models.CharField(
         max_length = 15,
         choices = BRANDS, 
-        default = UNDEFINED
+        default = ASICS
     )
     available = models.BooleanField(default=True)
 
@@ -54,7 +48,7 @@ class Size(models.Model):
 
 class Photo(models.Model):
     img = models.ImageField(
-        upload_to='images'
+        upload_to='images/sneakers'
     )
 
     product = models.ForeignKey(Product)

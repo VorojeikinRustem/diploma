@@ -9,27 +9,26 @@
     <p>Доставка от 1 часа до 2 дней</p>
     <p>Оплата заказа только после личной проверки товара</p>
   </div>
-	{% for product in product_list %}
-		{% if product.available == True %}
-
-	    	<div class="row">
-          <div class="col-xs-6 col-lg-4">
-            <div class="thumbnail">
-              {% with product.photo_set.all|first as image %}
-  						  <img class="img-rounded" src="{% static image.img %}">
-  						{% endwith %} 
-              <div class="caption">
-                <h2>{{ product.name }}</h2>
-                <a class="btn btn-primary" href="{% url 'product' product.slug %}">
-                    <span class="badge">
-                      {{ product.price }}
-                      <span class="glyphicon glyphicon-rub" aria-hidden="true"></span>
-                    </span> Подробнее &raquo;
-                </a>
-              </div>
-            </div>  
-          </div><!--/.col-xs-6.col-lg-4-->
-        </div><!--/row-->
-	  {% endif %}
-	{% endfor %} 
+  <div class="row">
+  	{% for product in product_list %}
+  		{% if product.available == True %}
+            <div class="col-xs-6 col-lg-4">
+              <div class="thumbnail">
+                {% with product.photo_set.all|first as image %}
+    						  <img class="img-rounded" src="{% static image.img %}">
+    						{% endwith %} 
+                <div class="caption">
+                  <h3>{{ product.name }}</h3>
+                  <a class="btn btn-primary" href="{% url 'product' product.brand product.slug %}">
+                      <span class="badge">
+                        {{ product.price }}
+                        <span class="glyphicon glyphicon-rub" aria-hidden="true"></span>
+                      </span> Подробнее &raquo;
+                  </a>
+                </div>
+              </div>  
+            </div><!--/.col-xs-6.col-lg-4-->
+  	  {% endif %}
+  	{% endfor %} 
+  </div><!--/row-->
 {% endblock %}

@@ -9,19 +9,26 @@ from django.core.mail import EmailMessage
 from .models import *
 
 
-COOKIES_ID ='walker_test3'
+COOKIES_ID ='shop'
+PHONE_NUMBER = 79781234567
 shop_name = u'Бродяга'
 
-
+ 
 def _categories():
     return [brand for brand in Product.BRANDS]
 
+
+def _current_category(brand):
+    return brand
+
+
 def _products_in_cart(request):
-    products_in_cart = len(CartElement.objects.filter(cart=Cart.objects.get(id=request.COOKIES.get(COOKIES_ID))))
-    if products_in_cart > 0:
-        return products_in_cart
+    if (request.COOKIES.get(COOKIES_ID, 0) != 0):
+        products_in_cart = len(CartElement.objects.filter(cart=Cart.objects.get(id=request.COOKIES.get(COOKIES_ID, 0))))
     else: 
-        return 0
+        products_in_cart = 0
+    return products_in_cart
+
 
 def index(request):
     context = {
@@ -47,10 +54,11 @@ def search(request):
 
 def product_list(request, brand):
     context = {
-        'cat': str(brand),
         'product_list': Product.objects.filter(brand=brand),
         'categories': [brand for brand in Product.BRANDS]
     }
+    context['current_category'] = _current_category(brand)
+    context['products_in_cart'] = _products_in_cart(request)
     return render(request, 'index.html', context)
 
 
@@ -120,12 +128,13 @@ def cart(request):
     context['cart_elements'] = cart_elements
     context['products_in_cart'] = _products_in_cart(request)
     context['categories'] = [brand for brand in Product.BRANDS]
+    context['total'] = sum([i.product.price for i in cart_elements])
     
     return render(request, 'cart.html', context)    
 
 
-def product(request, slug):
-    target_product = Product.objects.get(slug=slug)
+def product(request, brand, slug):
+    target_product = Product.objects.get(brand=brand, slug=slug)
     context = {
         'product': target_product,
         'sizes': Size.objects.filter(product=target_product),
@@ -133,6 +142,9 @@ def product(request, slug):
     }
     context['products_in_cart'] = _products_in_cart(request)
     context['categories'] = _categories()
+    context['breadcrumb_brand'] = target_product.brand
+    context['breadcrumb_slug'] = target_product.slug
+    context['current_category'] = _current_category(brand)
     return render(request, 'product.html', context)
 
 
@@ -147,7 +159,12 @@ def create_order(request):
 
     context = {
     }
-    
+    context['products_in_cart'] = _products_in_cart(request)
+
+    if (request.POST['username'] == '' or request.POST['phone'] == '' or request.POST['address'] == '' or request.POST['email'] == ''):
+        context['empty_form'] = True
+        return render(request, 'checkout.html', context)
+
     order = Order.objects.create(
         status=Order.OPEN,
         username=request.POST['username'],
@@ -160,19 +177,32 @@ def create_order(request):
         )
     )
 
+    message = u'<p>' + unicode(request.POST['username']) + u', добрый день.</p><p>Для проверки статуса заказа воспользуйтесь следующими данными: </p>' + u'<p><strong>Номер заказа:</strong> ' + unicode(order.id) + '</p>' + u'<p><strong>Номер телефона:</strong> ' + unicode(request.POST['phone']) + u'''
+        <p>Статусы заказа:</p>
+        <p><strong>Принят</strong> - заказ зарегестрирован. Возможно с вами свяжется администратор по телефону или электронной почты в случае возникших вопросов.</p>
+        <p><strong>Оформление</strong> - сбор заказанных товаров. Проверка товаро на наличие дефектов.</p>
+        <p><strong>Доставляется</strong> - ваш заказ доставляется курьером. Возможен звонок вам на телефон для уточнения места получения вами заказа.</p>
+        <p><<strong>Доставлен</strong> - заказ доставлен покупателю. Если это ваш заказ и вы не получили его, то срочно сообщити об этом нам.</p>
+        <p><strong>Отменен</strong> - по какой-либо причине заказ был отменен.</p>
+        '''    
+
     cart = Cart.objects.get(
         id=request.COOKIES.get(COOKIES_ID)
     )
+
+    if (request.POST['express_delivery']):
+        message + u'''<p>Ваш заказ для нас является приоритетным, так как вы выбрали срочную доставку.</p><p>Товар будет доставлен в течении <strong>5 часов</strong>.</p>'''
+        cart.total_amount += 500
+    else:
+        message + u'<p>Товар будет доставлен в течении 3 дней</p>'
+
     cart.closed = True
     cart.save()
 
     msg = EmailMessage(
         u'Заказ с интернет магазина - ' + shop_name,
-        request.POST['username'] 
-        + u''', ваш заказ принят. \nДля проверки статуса заказа перейдите по ссылке http://127.0.0.1:8000/order_status_form/ и воспользуйтесь следующими данными:\nИдентификатор заказа: ''' 
-        + str(order.id) + '\n' 
-        + u'Номер телефона: ' + str(request.POST['phone']), 
-        to=['te7ris@mail.ru'])
+        message + u'<p>За дополнительной информацией обращайтесь по номеру: ' + str(PHONE_NUMBER) + u'</p><p>Стоимость заказа: ' + str(cart.total_amount) + u' рублей</p>', 
+        to=[request.POST['email']])
 
     msg.send()
 
@@ -182,6 +212,24 @@ def create_order(request):
 
 
 def order_status(request):
+    
+    if (request.POST['phone'] == '' or request.POST['order_id'] == ''):
+        return redirect('/order_status_form/')
+    
+    try:
+        order = Order.objects.get(
+            id=request.POST['order_id'],
+            phone=request.POST['phone']
+        )
+    except Order.DoesNotExist:
+        context = {
+            'order_does_not_exist': True,
+            'order_id': request.POST['order_id'],
+            'order_phone': request.POST['phone']
+        }
+        context['products_in_cart'] = _products_in_cart(request)
+        return render(request, 'order_status_form.html', context)
+
     context = {
         'order': Order.objects.get(
             id=request.POST['order_id'],
@@ -197,5 +245,4 @@ def order_status_form(request):
     context = {
     }
     context['products_in_cart'] = _products_in_cart(request)
-
     return render(request, 'order_status_form.html', context)

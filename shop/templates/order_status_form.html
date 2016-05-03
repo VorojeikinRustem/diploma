@@ -3,12 +3,21 @@
 {% block content %}
 	{% load staticfiles %}
 
+	{% if order_accepted %}
+		<div class="alert alert-success" role="alert">
+		  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+		  <span class="sr-only">Error:</span>
+		  <strong>Заказ зарегестрирован</strong>
+		  <p>Информация о заказе и инструкция по отслеживанию статуса заказа высланы на электронную почту.</p>
+    </div>
+	{% endif %}
+	
 	<form class="form-horizontal" action="/order_status/" method="post">
 		{% csrf_token %}
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="order_id">Номер заказа: </label>
 			<div class="col-sm-10">
-				<input class="form-control" type="text" name="order_id" placeholder="Номер заказа">
+				<input data-order="order_id" class="form-control" type="text" name="order_id" placeholder="Номер заказа">
 			</div>
 		</div>
 
@@ -16,15 +25,31 @@
 			<label class="col-sm-2 control-label" for="phone">Номер телефона: </label>
 			<div class="col-sm-10">
 				<!-- <span class="input-group-addon">+</span> -->
-				<input type="tel" class="form-control" name="phone" pattern="[0-9]{11}">
+				<input data-order="phone" type="tel" class="form-control" name="phone" pattern="[0-9]{11}" placeholder="79781234567">
 			</div>
 		</div>
 			
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">	
-				<button class="btn btn-default" type="submit">Готово</button>
+				<button data-order="btn" class="btn btn-default" type="submit" disabled>Готово</button>
 			</div>
 		</div>
 	</form>
+	<div>
+		{% if order_does_not_exist %}
+			<div class="alert alert-danger" role="alert">
+			  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+			  <span class="sr-only">Error:</span>
+			  Заказ по вашим данным <strong>не найден</strong>
+			</div>
+			<p>Введенные данные: </p>
+			<p>Номер заказа: {{ order_id }}</p>
+			<p>Номер телефона: {{ order_phone }}</p>
+			<!-- <p>Если введенные данные верны, то свяжитесь с нами по ниже указанным контактам.</p>
+			<p>Наши контакты:</p>
+			<p>Телефон: +79781234567</p>
+			<p>Почта: crimea_sneakers@gmail.com</p> -->
 
+		{% endif %}
+	</div>
 {% endblock %}
