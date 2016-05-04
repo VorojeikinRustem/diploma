@@ -94,7 +94,7 @@ class Order(models.Model):
         default = OPEN
     )
     username = models.CharField(max_length=50)
-    phone = models.PositiveIntegerField()
+    phone = models.CharField(max_length=11)
     address = models.CharField(max_length=254)
     email = models.EmailField(max_length=100)
     express_delivery = models.BooleanField()

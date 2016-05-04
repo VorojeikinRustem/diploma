@@ -9,9 +9,9 @@ from django.core.mail import EmailMessage
 from .models import *
 
 
-COOKIES_ID ='shop'
+COOKIES_ID = 'shop'
 PHONE_NUMBER = 79781234567
-shop_name = u'Бродяга'
+SHOP_NAME = 'Crimea Sneakers'
 
  
 def _categories():
@@ -76,6 +76,9 @@ def add_product_to_cart(request):
         )
 
     cart_id = cart.id
+    cart.total_amount += Product.objects.get(id=product_id).price
+    cart.save()
+
     cart_element = CartElement.objects.create(
         product=Product.objects.get(
                 id=product_id 
@@ -155,11 +158,14 @@ def checkout(request):
 
 
 def create_order(request):
-    response = HttpResponseRedirect('/order_status_form/')
+    # response = HttpResponseRedirect('/order_status_form/')
 
     context = {
     }
     context['products_in_cart'] = _products_in_cart(request)
+    context['order_accepted'] = True
+
+    response = render(request, 'order_status_form.html', context)
 
     if (request.POST['username'] == '' or request.POST['phone'] == '' or request.POST['address'] == '' or request.POST['email'] == ''):
         context['empty_form'] = True
@@ -177,13 +183,13 @@ def create_order(request):
         )
     )
 
-    message = u'<p>' + unicode(request.POST['username']) + u', добрый день.</p><p>Для проверки статуса заказа воспользуйтесь следующими данными: </p>' + u'<p><strong>Номер заказа:</strong> ' + unicode(order.id) + '</p>' + u'<p><strong>Номер телефона:</strong> ' + unicode(request.POST['phone']) + u'''
-        <p>Статусы заказа:</p>
-        <p><strong>Принят</strong> - заказ зарегестрирован. Возможно с вами свяжется администратор по телефону или электронной почты в случае возникших вопросов.</p>
-        <p><strong>Оформление</strong> - сбор заказанных товаров. Проверка товаро на наличие дефектов.</p>
-        <p><strong>Доставляется</strong> - ваш заказ доставляется курьером. Возможен звонок вам на телефон для уточнения места получения вами заказа.</p>
-        <p><<strong>Доставлен</strong> - заказ доставлен покупателю. Если это ваш заказ и вы не получили его, то срочно сообщити об этом нам.</p>
-        <p><strong>Отменен</strong> - по какой-либо причине заказ был отменен.</p>
+    message = unicode(request.POST['username']) + u', добрый день.\nДля проверки статуса заказа воспользуйтесь следующими данными: \nНомер заказа: ' + unicode(order.id) + u'\nНомер телефона: ' + unicode(request.POST['phone']) + u'''
+        \nСтатусы заказа:
+        Принят - заказ зарегестрирован. Возможно с вами свяжется администратор по телефону или электронной почты в случае возникших вопросов.
+        Оформление - сбор заказанных товаров. Проверка товаров на наличие дефекты.
+        Доставляется - ваш заказ доставляется курьером. Возможен звонок вам на телефон для уточнения места получения вами заказа.
+        Доставлен - заказ доставлен покупателю. Если это ваш заказ и вы не получили его, то срочно сообщити об этом нам.
+        Отменен - по какой-либо причине заказ был отменен.
         '''    
 
     cart = Cart.objects.get(
@@ -191,25 +197,26 @@ def create_order(request):
     )
 
     if (request.POST['express_delivery']):
-        message + u'''<p>Ваш заказ для нас является приоритетным, так как вы выбрали срочную доставку.</p><p>Товар будет доставлен в течении <strong>5 часов</strong>.</p>'''
+        message + u'''\nВаш заказ для нас является приоритетным, так как вы выбрали срочную доставку.\nТовар будет доставлен в течении 5 часов.'''
         cart.total_amount += 500
     else:
-        message + u'<p>Товар будет доставлен в течении 3 дней</p>'
+        message + u'\nТовар будет доставлен в течении 3 дней'
 
     cart.closed = True
     cart.save()
 
     msg = EmailMessage(
-        u'Заказ с интернет магазина - ' + shop_name,
-        message + u'<p>За дополнительной информацией обращайтесь по номеру: ' + str(PHONE_NUMBER) + u'</p><p>Стоимость заказа: ' + str(cart.total_amount) + u' рублей</p>', 
+        u'Заказ с интернет магазина - ' + SHOP_NAME,
+        message + u'\nЗа дополнительной информацией обращайтесь по номеру: ' + str(PHONE_NUMBER) + u'\nСтоимость заказа: ' + str(cart.total_amount) + u' рублей.', 
         to=[request.POST['email']])
 
     msg.send()
 
+    # response.delete_cookie(COOKIES_ID)
     response.delete_cookie(COOKIES_ID)
 
+    # return response
     return response
-
 
 def order_status(request):
     
